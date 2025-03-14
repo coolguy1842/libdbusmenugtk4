@@ -12,7 +12,7 @@ if(fs.exists('generated') != true)
 endif
 
 # TODO: for now its an executable for testing, make library later
-inc = include_directories('generated', 'include')
+libdbusmenugtk4_include = include_directories('generated', 'include')
 
 libdbusmenugtk4 = shared_library(
     'libdbusmenugtk4',
@@ -27,7 +27,7 @@ libdbusmenugtk4 = shared_library(
             'src/dbusMenu.cpp'
         )
     ],
-    include_directories : inc,
+    include_directories : libdbusmenugtk4_include,
     install : false,
     dependencies: [
         dependency('fmt'),
@@ -37,7 +37,7 @@ libdbusmenugtk4 = shared_library(
 )
 
 libdbusmenugtk4_dep = declare_dependency(
-    include_directories : inc,
+    include_directories : libdbusmenugtk4_include,
     link_with : libdbusmenugtk4,
     dependencies: [
         dependency('fmt'),
