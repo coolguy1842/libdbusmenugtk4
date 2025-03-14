@@ -14,7 +14,7 @@ endif
 # TODO: for now its an executable for testing, make library later
 inc = include_directories('generated', 'include')
 
-libdbusmenu = shared_library(
+libdbusmenugtk4 = shared_library(
     'libdbusmenugtk4',
     sources: [
         files(
@@ -36,9 +36,9 @@ libdbusmenu = shared_library(
     ]
 )
 
-libdbusmenu_dep = declare_dependency(
+libdbusmenugtk4_dep = declare_dependency(
     include_directories : inc,
-    link_with : libdbusmenu,
+    link_with : libdbusmenugtk4,
     dependencies: [
         dependency('fmt'),
         dependency('gtk4'),
