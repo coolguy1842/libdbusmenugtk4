@@ -23,7 +23,15 @@ Glib::RefPtr<Gio::MenuItem> libdbusmenu::Menu::makeItem(gint32 id, std::map<Glib
         action     = Gio::SimpleAction::create_bool(actionName, value);
 
         action->signal_activate().connect([id, this](const Glib::VariantBase&) {
-            _proxy->Event_sync(id, "clicked", Glib::Variant<std::string>::create(""), time(NULL));
+            _proxy->Event(
+                id,
+                "clicked",
+                Glib::Variant<std::string>::create(""),
+                time(NULL),
+                [this](Glib::RefPtr<Gio::AsyncResult>& res) {
+                    _proxy->Event_finish(res);
+                }
+            );
         });
 
         actionGroup->add_action(action);
@@ -37,7 +45,15 @@ Glib::RefPtr<Gio::MenuItem> libdbusmenu::Menu::makeItem(gint32 id, std::map<Glib
     else {
         action = Gio::SimpleAction::create(actionName);
         action->signal_activate().connect([action, id, this](const Glib::VariantBase&) {
-            _proxy->Event_sync(id, "clicked", Glib::Variant<std::string>::create(""), time(NULL));
+            _proxy->Event(
+                id,
+                "clicked",
+                Glib::Variant<std::string>::create(""),
+                time(NULL),
+                [this](Glib::RefPtr<Gio::AsyncResult>& res) {
+                    _proxy->Event_finish(res);
+                }
+            );
         });
 
         actionGroup->add_action(action);
