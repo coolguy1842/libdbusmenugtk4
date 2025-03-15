@@ -118,7 +118,7 @@ void libdbusmenu::Menu::makeMenu(Gio::Menu* model, Gio::SimpleActionGroup* actio
     }
 }
 
-void libdbusmenu::Menu::reloadItems() {
+void libdbusmenu::Menu::reloadItems(guint32 revision, gint32 parent) {
     _proxy->GetLayout(0, -1, {}, [&](const Glib::RefPtr<Gio::AsyncResult>& res) {
         guint32 revision;
         std::tuple<gint32, std::map<Glib::ustring, Glib::VariantBase>, std::vector<Glib::VariantBase>> layout;
@@ -134,6 +134,17 @@ void libdbusmenu::Menu::reloadItems() {
     });
 }
 
+void libdbusmenu::Menu::onProxyCreate(const Glib::RefPtr<Gio::AsyncResult>& res) {
+    _proxy = com::canonical::dbusmenuProxy::createForBusFinish(res);
+
+    if(_proxy != nullptr) {
+        reloadItems();
+        // TODO: make sure ItemsPropertiesUpdated_signal doesn't have to be used
+        // make it only update the relevant child display
+        _proxy->LayoutUpdated_signal.connect(sigc::mem_fun(*this, &libdbusmenu::Menu::reloadItems));
+    }
+}
+
 static uint64_t actionID = 0;
 libdbusmenu::Menu::~Menu() {}
 libdbusmenu::Menu::Menu(Gio::DBus::BusType busType, std::string busName, std::string objectPath)
@@ -145,14 +156,7 @@ libdbusmenu::Menu::Menu(Gio::DBus::BusType busType, std::string busName, std::st
         Gio::DBus::ProxyFlags::NONE,
         busName,
         objectPath,
-        [&](const Glib::RefPtr<Gio::AsyncResult>& res) {
-            _proxy = com::canonical::dbusmenuProxy::createForBusFinish(res);
-
-            reloadItems();
-            // TODO: make sure ItemsPropertiesUpdated_signal doesn't have to be used
-            // make it only update the relevant child display
-            _proxy->LayoutUpdated_signal.connect([&](guint32, gint32) { reloadItems(); });
-        }
+        sigc::mem_fun(*this, &libdbusmenu::Menu::onProxyCreate)
     );
 }
 

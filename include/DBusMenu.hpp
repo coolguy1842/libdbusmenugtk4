@@ -17,7 +17,8 @@ private:
     Glib::RefPtr<Gio::MenuItem> makeItem(gint32 id, std::map<Glib::ustring, Glib::VariantBase> properties, Gio::SimpleActionGroup* actionGroup, std::string actionGroupPrefix);
     void makeMenu(Gio::Menu* model, Gio::SimpleActionGroup* actionGroup, std::tuple<gint32, std::map<Glib::ustring, Glib::VariantBase>, std::vector<Glib::VariantBase>> layout, bool debug = true, int blockLevel = 0);
 
-    void reloadItems();
+    void reloadItems(guint32 revision = 0, gint32 parent = 0);
+    void onProxyCreate(const Glib::RefPtr<Gio::AsyncResult>& res);
 
 public:
     ~Menu();
